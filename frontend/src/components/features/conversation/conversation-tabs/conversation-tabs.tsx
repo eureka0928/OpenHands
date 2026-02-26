@@ -17,6 +17,7 @@ import { useConversationStore } from "#/stores/conversation-store";
 import { ConversationTabsContextMenu } from "./conversation-tabs-context-menu";
 import { useConversationId } from "#/hooks/use-conversation-id";
 import { useSelectConversationTab } from "#/hooks/use-select-conversation-tab";
+import { useTaskList } from "#/hooks/use-task-list";
 
 export function ConversationTabs() {
   const { conversationId } = useConversationId();
@@ -26,6 +27,8 @@ export function ConversationTabs() {
 
   const { state: persistedState } =
     useConversationLocalStorageState(conversationId);
+
+  const { hasTaskList } = useTaskList();
 
   const {
     selectTab,
@@ -119,6 +122,18 @@ export function ConversationTabs() {
       label: t(I18nKey.COMMON$BROWSER),
     },
   ];
+
+  if (hasTaskList) {
+    tabs.unshift({
+      tabValue: "tasklist",
+      isActive: isTabActive("tasklist"),
+      icon: LessonPlanIcon,
+      onClick: () => selectTab("tasklist"),
+      tooltipContent: t(I18nKey.COMMON$TASK_LIST),
+      tooltipAriaLabel: t(I18nKey.COMMON$TASK_LIST),
+      label: t(I18nKey.COMMON$TASK_LIST),
+    });
+  }
 
   // Filter out unpinned tabs
   const visibleTabs = tabs.filter(
