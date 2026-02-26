@@ -8,6 +8,7 @@
 # This module belongs to the old V0 web server. The V1 application server lives under openhands/app_server/.
 import asyncio
 import logging
+import os
 from collections import defaultdict
 from datetime import datetime, timedelta
 from urllib.parse import urlparse
@@ -20,32 +21,43 @@ from starlette.requests import Request as StarletteRequest
 from starlette.responses import Response
 from starlette.types import ASGIApp
 
-from openhands.app_server.config import get_global_config
+
+def _resolve_cors_origins() -> tuple[str, ...]:
+    """Resolve CORS allowed origins from environment variables.
+
+    Priority: PERMITTED_CORS_ORIGINS > WEB_HOST > empty (localhost always allowed separately).
+    """
+    allow_origins_str = os.getenv('PERMITTED_CORS_ORIGINS')
+    if allow_origins_str:
+        return tuple(origin.strip() for origin in allow_origins_str.split(','))
+    # Fall back to WEB_HOST (the V1-standard external URL config)
+    web_host = os.getenv('WEB_HOST')
+    if web_host:
+        return (f'https://{web_host}', f'http://{web_host}')
+    return ()
 
 
 class LocalhostCORSMiddleware(CORSMiddleware):
-    """Custom CORS middleware that allows any request from localhost/127.0.0.1 domains,
-    while using standard CORS rules for other origins.
+    """Custom CORS middleware that always allows localhost/127.0.0.1 origins,
+    plus any origins configured via PERMITTED_CORS_ORIGINS or WEB_HOST env vars.
     """
 
     def __init__(self, app: ASGIApp) -> None:
-        config = get_global_config()
-        allow_origins = tuple(config.permitted_cors_origins)
         super().__init__(
             app,
-            allow_origins=allow_origins,
+            allow_origins=_resolve_cors_origins(),
             allow_credentials=True,
             allow_methods=['*'],
             allow_headers=['*'],
         )
 
     def is_allowed_origin(self, origin: str) -> bool:
-        if origin and not self.allow_origins and not self.allow_origin_regex:
+        if origin:
             parsed = urlparse(origin)
             hostname = parsed.hostname or ''
 
-            # Allow any localhost/127.0.0.1 origin regardless of port
-            if hostname in ['localhost', '127.0.0.1']:
+            # Allow any localhost/127.0.0.1 origin regardless of port or config
+            if hostname in ('localhost', '127.0.0.1'):
                 return True
 
             # Allow any origin when no specific origins are configured (development mode)
