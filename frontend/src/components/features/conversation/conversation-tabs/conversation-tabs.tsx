@@ -7,6 +7,7 @@ import GitChanges from "#/icons/git_changes.svg?react";
 import VSCodeIcon from "#/icons/vscode.svg?react";
 import ThreeDotsVerticalIcon from "#/icons/three-dots-vertical.svg?react";
 import LessonPlanIcon from "#/icons/lesson-plan.svg?react";
+import CheckCircleIcon from "#/icons/u-check-circle.svg?react";
 import { cn } from "#/utils/utils";
 import { useConversationLocalStorageState } from "#/utils/conversation-local-storage";
 import { ConversationTabNav } from "./conversation-tab-nav";
@@ -127,7 +128,7 @@ export function ConversationTabs() {
     tabs.unshift({
       tabValue: "tasklist",
       isActive: isTabActive("tasklist"),
-      icon: LessonPlanIcon,
+      icon: CheckCircleIcon,
       onClick: () => selectTab("tasklist"),
       tooltipContent: t(I18nKey.COMMON$TASK_LIST),
       tooltipAriaLabel: t(I18nKey.COMMON$TASK_LIST),

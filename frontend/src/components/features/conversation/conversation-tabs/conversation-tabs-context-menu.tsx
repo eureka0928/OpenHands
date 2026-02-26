@@ -13,6 +13,7 @@ import VSCodeIcon from "#/icons/vscode.svg?react";
 import PillIcon from "#/icons/pill.svg?react";
 import PillFillIcon from "#/icons/pill-fill.svg?react";
 import LessonPlanIcon from "#/icons/lesson-plan.svg?react";
+import CheckCircleIcon from "#/icons/u-check-circle.svg?react";
 import { useTaskList } from "#/hooks/use-task-list";
 
 interface ConversationTabsContextMenuProps {
@@ -48,7 +49,7 @@ export function ConversationTabsContextMenu({
   if (hasTaskList) {
     tabConfig.unshift({
       tab: "tasklist",
-      icon: LessonPlanIcon,
+      icon: CheckCircleIcon,
       i18nKey: I18nKey.COMMON$TASK_LIST,
     });
   }
