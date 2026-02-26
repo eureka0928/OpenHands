@@ -1,0 +1,31 @@
+import { useTranslation } from "react-i18next";
+import { I18nKey } from "#/i18n/declaration";
+import LessonPlanIcon from "#/icons/lesson-plan.svg?react";
+import { TaskItem } from "#/components/features/chat/task-tracking/task-item";
+import { useTaskList } from "#/hooks/use-task-list";
+
+function TaskListTab() {
+  const { t } = useTranslation();
+  const { taskList } = useTaskList();
+
+  if (taskList.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center w-full h-full p-10 gap-4">
+        <LessonPlanIcon width={109} height={109} color="#A1A1A1" />
+        <span className="text-[#8D95A9] text-[19px] font-normal leading-5">
+          {t(I18nKey.COMMON$NO_TASKS)}
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <main className="h-full overflow-y-scroll p-4 md:pr-1.5 gap-3 flex flex-col custom-scrollbar-always">
+      {taskList.map((task) => (
+        <TaskItem key={task.id} task={task} />
+      ))}
+    </main>
+  );
+}
+
+export default TaskListTab;
