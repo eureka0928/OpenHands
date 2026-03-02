@@ -1,11 +1,12 @@
-from unittest.mock import MagicMock, patch
+import os
+from unittest.mock import patch
 
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from starlette.middleware.cors import CORSMiddleware
 
-from openhands.server.middleware import LocalhostCORSMiddleware, _resolve_cors_origins
+from openhands.server.middleware import LocalhostCORSMiddleware, resolve_cors_origins
 
 
 @pytest.fixture
@@ -21,31 +22,24 @@ def app():
 
 
 def test_localhost_cors_middleware_init_with_config():
-    """Test that the middleware correctly reads permitted_cors_origins from global config."""
-    mock_config = MagicMock()
-    mock_config.permitted_cors_origins = [
-        'https://example.com',
-        'https://test.com',
-    ]
-    with patch(
-        'openhands.server.middleware.get_global_config', return_value=mock_config
+    """Test that the middleware correctly reads origins from env vars."""
+    with patch.dict(
+        os.environ,
+        {'PERMITTED_CORS_ORIGINS': 'https://example.com,https://test.com'},
+        clear=True,
     ):
         app = FastAPI()
         middleware = LocalhostCORSMiddleware(app)
 
-        # Check that the origins were correctly read from the config
+        # Check that the origins were correctly read from the env var
         assert 'https://example.com' in middleware.allow_origins
         assert 'https://test.com' in middleware.allow_origins
         assert len(middleware.allow_origins) == 2
 
 
 def test_localhost_cors_middleware_init_without_config():
-    """Test that the middleware works correctly without permitted_cors_origins configured."""
-    mock_config = MagicMock()
-    mock_config.permitted_cors_origins = []
-    with patch(
-        'openhands.server.middleware.get_global_config', return_value=mock_config
-    ):
+    """Test that the middleware works correctly without origins configured."""
+    with patch.dict(os.environ, {}, clear=True):
         app = FastAPI()
         middleware = LocalhostCORSMiddleware(app)
 
@@ -55,11 +49,7 @@ def test_localhost_cors_middleware_init_without_config():
 
 def test_localhost_cors_middleware_is_allowed_origin_localhost(app):
     """Test that localhost origins are allowed regardless of port when no specific origins are configured."""
-    mock_config = MagicMock()
-    mock_config.permitted_cors_origins = []
-    with patch(
-        'openhands.server.middleware.get_global_config', return_value=mock_config
-    ):
+    with patch.dict(os.environ, {}, clear=True):
         app.add_middleware(LocalhostCORSMiddleware)
         client = TestClient(app)
 
@@ -87,10 +77,8 @@ def test_localhost_cors_middleware_is_allowed_origin_localhost(app):
 
 def test_localhost_cors_middleware_is_allowed_origin_non_localhost(app):
     """Test that non-localhost origins follow the standard CORS rules."""
-    mock_config = MagicMock()
-    mock_config.permitted_cors_origins = ['https://example.com']
-    with patch(
-        'openhands.server.middleware.get_global_config', return_value=mock_config
+    with patch.dict(
+        os.environ, {'PERMITTED_CORS_ORIGINS': 'https://example.com'}, clear=True
     ):
         app.add_middleware(LocalhostCORSMiddleware)
         client = TestClient(app)
@@ -109,11 +97,7 @@ def test_localhost_cors_middleware_is_allowed_origin_non_localhost(app):
 
 def test_localhost_cors_middleware_missing_origin(app):
     """Test behavior when Origin header is missing."""
-    mock_config = MagicMock()
-    mock_config.permitted_cors_origins = []
-    with patch(
-        'openhands.server.middleware.get_global_config', return_value=mock_config
-    ):
+    with patch.dict(os.environ, {}, clear=True):
         app.add_middleware(LocalhostCORSMiddleware)
         client = TestClient(app)
 
@@ -245,52 +229,48 @@ def test_localhost_cors_middleware_localhost_works_with_permitted_origins(app):
         )
 
 
-def test_resolve_cors_origins_permitted_origins():
-    """Test _resolve_cors_origins with PERMITTED_CORS_ORIGINS."""
+def testresolve_cors_origins_permitted_origins():
+    """Test resolve_cors_origins with PERMITTED_CORS_ORIGINS."""
     with patch.dict(
         os.environ,
         {'PERMITTED_CORS_ORIGINS': 'https://a.com, https://b.com'},
         clear=True,
     ):
-        result = _resolve_cors_origins()
+        result = resolve_cors_origins()
         assert result == ('https://a.com', 'https://b.com')
 
 
-def test_resolve_cors_origins_web_host():
-    """Test _resolve_cors_origins with WEB_HOST."""
+def testresolve_cors_origins_web_host():
+    """Test resolve_cors_origins with WEB_HOST."""
     with patch.dict(os.environ, {'WEB_HOST': 'myserver.example.com'}, clear=True):
-        result = _resolve_cors_origins()
+        result = resolve_cors_origins()
         assert result == (
             'https://myserver.example.com',
             'http://myserver.example.com',
         )
 
 
-def test_resolve_cors_origins_precedence():
+def testresolve_cors_origins_precedence():
     """Test that PERMITTED_CORS_ORIGINS takes precedence over WEB_HOST."""
     with patch.dict(
         os.environ,
         {'PERMITTED_CORS_ORIGINS': 'https://explicit.com', 'WEB_HOST': 'fallback.com'},
         clear=True,
     ):
-        result = _resolve_cors_origins()
+        result = resolve_cors_origins()
         assert result == ('https://explicit.com',)
 
 
-def test_resolve_cors_origins_empty():
-    """Test _resolve_cors_origins with no env vars."""
+def testresolve_cors_origins_empty():
+    """Test resolve_cors_origins with no env vars."""
     with patch.dict(os.environ, {}, clear=True):
-        result = _resolve_cors_origins()
+        result = resolve_cors_origins()
         assert result == ()
 
 
 def test_localhost_cors_middleware_cors_parameters():
     """Test that CORS parameters are set correctly in the middleware."""
-    mock_config = MagicMock()
-    mock_config.permitted_cors_origins = []
-    with patch(
-        'openhands.server.middleware.get_global_config', return_value=mock_config
-    ):
+    with patch.dict(os.environ, {}, clear=True):
         # We need to inspect the initialization parameters rather than attributes
         # since CORSMiddleware doesn't expose these as attributes
         with patch('fastapi.middleware.cors.CORSMiddleware.__init__') as mock_init:
@@ -302,6 +282,79 @@ def test_localhost_cors_middleware_cors_parameters():
             mock_init.assert_called_once()
             _, kwargs = mock_init.call_args
 
-            assert kwargs['allow_credentials'] is True
-            assert kwargs['allow_methods'] == ['*']
-            assert kwargs['allow_headers'] == ['*']
+        assert kwargs['allow_credentials'] is True
+        assert kwargs['allow_methods'] == ['*']
+        assert kwargs['allow_headers'] == ['*']
+
+
+def test_resolve_cors_origins_strips_web_host_whitespace():
+    """Test that WEB_HOST is stripped of whitespace."""
+    with patch.dict(os.environ, {'WEB_HOST': '  example.com  '}, clear=True):
+        result = resolve_cors_origins()
+        assert result == ('https://example.com', 'http://example.com')
+
+
+def test_resolve_cors_origins_empty_web_host():
+    """Test that a whitespace-only WEB_HOST is treated as unset."""
+    with patch.dict(os.environ, {'WEB_HOST': '   '}, clear=True):
+        result = resolve_cors_origins()
+        assert result == ()
+
+
+def test_resolve_cors_origins_filters_empty_entries():
+    """Test that empty entries from trailing commas are filtered out."""
+    with patch.dict(
+        os.environ, {'PERMITTED_CORS_ORIGINS': 'https://a.com,,https://b.com,'}, clear=True
+    ):
+        result = resolve_cors_origins()
+        assert result == ('https://a.com', 'https://b.com')
+
+
+try:
+    import socketio as _socketio  # noqa: F401
+
+    _has_socketio = True
+except ImportError:
+    _has_socketio = False
+
+
+@pytest.mark.skipif(not _has_socketio, reason='socketio not installed')
+def test_get_cors_origins_includes_localhost_when_web_host_set():
+    """Test that Socket.IO CORS origins include localhost when WEB_HOST is set."""
+    from openhands.server.shared import _get_cors_origins
+
+    with patch.dict(os.environ, {'WEB_HOST': 'example.com'}, clear=True):
+        origins = _get_cors_origins()
+        assert isinstance(origins, list)
+        # External origins present
+        assert 'https://example.com' in origins
+        assert 'http://example.com' in origins
+        # Localhost origins present for dev
+        assert 'http://localhost:3000' in origins
+        assert 'http://localhost:3001' in origins
+        assert 'http://127.0.0.1:3000' in origins
+
+
+@pytest.mark.skipif(not _has_socketio, reason='socketio not installed')
+def test_get_cors_origins_includes_localhost_when_permitted_origins_set():
+    """Test that Socket.IO CORS origins include localhost when PERMITTED_CORS_ORIGINS is set."""
+    from openhands.server.shared import _get_cors_origins
+
+    with patch.dict(
+        os.environ, {'PERMITTED_CORS_ORIGINS': 'https://prod.example.com'}, clear=True
+    ):
+        origins = _get_cors_origins()
+        assert isinstance(origins, list)
+        assert 'https://prod.example.com' in origins
+        assert 'http://localhost:3000' in origins
+        assert 'http://localhost:3001' in origins
+
+
+@pytest.mark.skipif(not _has_socketio, reason='socketio not installed')
+def test_get_cors_origins_wildcard_when_no_env():
+    """Test that Socket.IO CORS origins default to '*' when no env vars are set."""
+    from openhands.server.shared import _get_cors_origins
+
+    with patch.dict(os.environ, {}, clear=True):
+        origins = _get_cors_origins()
+        assert origins == '*'
