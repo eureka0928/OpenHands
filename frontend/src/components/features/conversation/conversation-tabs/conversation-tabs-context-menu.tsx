@@ -13,7 +13,7 @@ import VSCodeIcon from "#/icons/vscode.svg?react";
 import PillIcon from "#/icons/pill.svg?react";
 import PillFillIcon from "#/icons/pill-fill.svg?react";
 import LessonPlanIcon from "#/icons/lesson-plan.svg?react";
-import CheckCircleIcon from "#/icons/u-check-circle.svg?react";
+import DoubleCheckIcon from "#/icons/double-check.svg?react";
 import { useTaskList } from "#/hooks/use-task-list";
 
 interface ConversationTabsContextMenuProps {
@@ -49,7 +49,7 @@ export function ConversationTabsContextMenu({
   if (hasTaskList) {
     tabConfig.unshift({
       tab: "tasklist",
-      icon: CheckCircleIcon,
+      icon: DoubleCheckIcon,
       i18nKey: I18nKey.COMMON$TASK_LIST,
     });
   }

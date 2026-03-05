@@ -10,7 +10,6 @@ vi.mock("react-i18next", () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
         COMMON$NO_TASKS: "No tasks yet",
-        TASK_TRACKING_OBSERVATION$TASK_ID: "ID",
         TASK_TRACKING_OBSERVATION$TASK_NOTES: "Notes",
       };
       return translations[key] || key;
@@ -87,16 +86,14 @@ describe("TaskListTab", () => {
     expect(taskItems).toHaveLength(3);
   });
 
-  it("displays task IDs for each task", () => {
+  it("does not display task IDs", () => {
     setTasks([
       { id: "task-1", title: "First task", status: "todo" },
-      { id: "task-2", title: "Second task", status: "in_progress" },
     ]);
 
     render(<TaskListTab />);
 
-    expect(screen.getByText("ID: task-1")).toBeInTheDocument();
-    expect(screen.getByText("ID: task-2")).toBeInTheDocument();
+    expect(screen.queryByText(/task-1/)).not.toBeInTheDocument();
   });
 
   it("highlights in_progress tasks with a background", () => {
@@ -111,13 +108,13 @@ describe("TaskListTab", () => {
     // Find each task item via its text, then check the wrapper div
     const activeItem = screen.getByText("Active task").closest("[data-name]");
     const activeWrapper = activeItem?.parentElement;
-    expect(activeWrapper?.className).toContain("bg-[#25272d]");
+    expect(activeWrapper?.className).toContain("bg-[#2D3039]");
 
     const todoItem = screen.getByText("Todo task").closest("[data-name]");
-    expect(todoItem?.parentElement?.className).not.toContain("bg-[#25272d]");
+    expect(todoItem?.parentElement?.className).not.toContain("bg-[#2D3039]");
 
     const doneItem = screen.getByText("Done task").closest("[data-name]");
-    expect(doneItem?.parentElement?.className).not.toContain("bg-[#25272d]");
+    expect(doneItem?.parentElement?.className).not.toContain("bg-[#2D3039]");
   });
 
   it("displays task notes when present and omits when absent", () => {

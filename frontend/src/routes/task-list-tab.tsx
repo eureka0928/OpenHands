@@ -28,7 +28,7 @@ function TaskListTab() {
           key={task.id}
           className={cn(
             "rounded-lg",
-            task.status === "in_progress" && "bg-[#25272d]",
+            task.status === "in_progress" && "bg-[#2D3039]",
           )}
         >
           <TaskItem task={task} />
