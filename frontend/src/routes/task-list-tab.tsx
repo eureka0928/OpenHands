@@ -22,12 +22,12 @@ function TaskListTab() {
   }
 
   return (
-    <main className="h-full overflow-y-scroll p-4 md:pr-1.5 flex flex-col custom-scrollbar-always">
+    <main className="h-full overflow-y-scroll flex flex-col custom-scrollbar-always">
       {taskList.map((task) => (
         <div
           key={task.id}
           className={cn(
-            "rounded-lg",
+            "px-4 py-2",
             task.status === "in_progress" && "bg-[#2D3039]",
           )}
         >

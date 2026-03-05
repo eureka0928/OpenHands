@@ -37,7 +37,7 @@ export function TaskItem({ task }: TaskItemProps) {
   return (
     <div className="flex gap-2 items-center w-full" data-name="item">
       <div className="shrink-0">{icon}</div>
-      <div className="flex flex-col items-start justify-center leading-[20px] text-nowrap whitespace-pre font-normal">
+      <div className="flex flex-col items-start justify-center leading-[16px] text-nowrap whitespace-pre font-normal">
         <Typography.Text
           className={cn(
             "text-[12px]",
