@@ -22,7 +22,7 @@ function TaskListTab() {
   }
 
   return (
-    <main className="h-full overflow-y-scroll flex flex-col custom-scrollbar-always">
+    <main className="h-full overflow-y-auto flex flex-col custom-scrollbar-always">
       {taskList.map((task) => (
         <div
           key={task.id}
