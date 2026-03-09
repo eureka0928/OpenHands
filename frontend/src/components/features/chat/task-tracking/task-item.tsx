@@ -26,7 +26,7 @@ export function TaskItem({ task }: TaskItemProps) {
       case "in_progress":
         return <LoadingIcon className="w-4 h-4 text-[#ffffff] animate-spin" />;
       case "done":
-        return <CheckCircleIcon className="w-4 h-4 text-[#6B7280]" />;
+        return <CheckCircleIcon className="w-4 h-4 text-[#A3A3A3]" />;
       default:
         return <CircleIcon className="w-4 h-4 text-[#ffffff]" />;
     }
@@ -41,7 +41,7 @@ export function TaskItem({ task }: TaskItemProps) {
         <Typography.Text
           className={cn(
             "text-[12px]",
-            isDoneStatus ? "text-[#6B7280]" : "text-white",
+            isDoneStatus ? "text-[#A3A3A3]" : "text-white",
           )}
         >
           {task.title}
