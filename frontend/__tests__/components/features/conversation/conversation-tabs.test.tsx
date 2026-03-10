@@ -16,6 +16,14 @@ vi.mock("#/hooks/use-conversation-id", () => ({
   useConversationId: () => ({ conversationId: mockConversationId }),
 }));
 
+let mockHasTaskList = false;
+vi.mock("#/hooks/use-task-list", () => ({
+  useTaskList: () => ({
+    hasTaskList: mockHasTaskList,
+    taskList: [],
+  }),
+}));
+
 const createWrapper = (conversationId: string) => {
   return ({ children }: { children: React.ReactNode }) => (
     <MemoryRouter initialEntries={[`/conversations/${conversationId}`]}>
@@ -31,6 +39,7 @@ describe("ConversationTabs localStorage behavior", () => {
     localStorage.clear();
     vi.resetAllMocks();
     mockConversationId = TASK_CONVERSATION_ID;
+    mockHasTaskList = false;
     useConversationStore.setState({
       selectedTab: null,
       isRightPanelShown: false,
@@ -203,6 +212,73 @@ describe("ConversationTabs localStorage behavior", () => {
         localStorage.getItem(`conversation-state-${REAL_CONVERSATION_ID}`)!,
       );
       expect(storedState.selectedTab).toBe("browser");
+    });
+  });
+
+  describe("tasklist tab", () => {
+    beforeEach(() => {
+      mockConversationId = REAL_CONVERSATION_ID;
+      mockHasTaskList = true;
+    });
+
+    it("should show tasklist tab when hasTaskList is true", () => {
+      render(<ConversationTabs />, {
+        wrapper: createWrapper(REAL_CONVERSATION_ID),
+      });
+
+      expect(
+        screen.getByTestId("conversation-tab-tasklist"),
+      ).toBeInTheDocument();
+    });
+
+    it("should select tasklist tab when clicked", async () => {
+      const user = userEvent.setup();
+
+      render(<ConversationTabs />, {
+        wrapper: createWrapper(REAL_CONVERSATION_ID),
+      });
+
+      const tasklistTab = screen.getByTestId("conversation-tab-tasklist");
+      await user.click(tasklistTab);
+
+      const { selectedTab, hasRightPanelToggled } =
+        useConversationStore.getState();
+      expect(selectedTab).toBe("tasklist");
+      expect(hasRightPanelToggled).toBe(true);
+    });
+
+    it("should show tasklist in context menu when hasTaskList is true", () => {
+      render(<ConversationTabsContextMenu isOpen={true} onClose={vi.fn()} />);
+
+      expect(screen.getByText("COMMON$TASK_LIST")).toBeInTheDocument();
+    });
+
+    it("should hide tasklist tab after unpinning it from context menu", async () => {
+      const user = userEvent.setup();
+
+      render(
+        <>
+          <ConversationTabs />
+          <ConversationTabsContextMenu isOpen={true} onClose={vi.fn()} />
+        </>,
+        { wrapper: createWrapper(REAL_CONVERSATION_ID) },
+      );
+
+      expect(
+        screen.getByTestId("conversation-tab-tasklist"),
+      ).toBeInTheDocument();
+
+      const tasklistItem = screen.getByText("COMMON$TASK_LIST");
+      await user.click(tasklistItem);
+
+      expect(
+        screen.queryByTestId("conversation-tab-tasklist"),
+      ).not.toBeInTheDocument();
+
+      const storedState = JSON.parse(
+        localStorage.getItem(`conversation-state-${REAL_CONVERSATION_ID}`)!,
+      );
+      expect(storedState.unpinnedTabs).toContain("tasklist");
     });
   });
 });
