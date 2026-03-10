@@ -215,6 +215,58 @@ describe("ConversationTabs localStorage behavior", () => {
     });
   });
 
+  describe("ConversationTabsContextMenu", () => {
+    beforeEach(() => {
+      mockConversationId = REAL_CONVERSATION_ID;
+    });
+
+    it("should render nothing when isOpen is false", () => {
+      const { container } = render(
+        <ConversationTabsContextMenu isOpen={false} onClose={vi.fn()} />,
+      );
+
+      expect(container.innerHTML).toBe("");
+    });
+
+    it("should render all default tabs when open", () => {
+      render(<ConversationTabsContextMenu isOpen={true} onClose={vi.fn()} />);
+
+      const expectedTabs = [
+        "COMMON$PLANNER",
+        "COMMON$CHANGES",
+        "COMMON$CODE",
+        "COMMON$TERMINAL",
+        "COMMON$APP",
+        "COMMON$BROWSER",
+      ];
+      for (const tab of expectedTabs) {
+        expect(screen.getByText(tab)).toBeInTheDocument();
+      }
+    });
+
+    it("should re-pin a tab when clicking an unpinned tab", async () => {
+      const user = userEvent.setup();
+
+      render(<ConversationTabsContextMenu isOpen={true} onClose={vi.fn()} />);
+
+      const terminalItem = screen.getByText("COMMON$TERMINAL");
+
+      // Unpin
+      await user.click(terminalItem);
+      let storedState = JSON.parse(
+        localStorage.getItem(`conversation-state-${REAL_CONVERSATION_ID}`)!,
+      );
+      expect(storedState.unpinnedTabs).toContain("terminal");
+
+      // Re-pin
+      await user.click(terminalItem);
+      storedState = JSON.parse(
+        localStorage.getItem(`conversation-state-${REAL_CONVERSATION_ID}`)!,
+      );
+      expect(storedState.unpinnedTabs).not.toContain("terminal");
+    });
+  });
+
   describe("tasklist tab", () => {
     beforeEach(() => {
       mockConversationId = REAL_CONVERSATION_ID;
