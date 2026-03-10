@@ -3,12 +3,10 @@ import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { ConversationTabsContextMenu } from "#/components/features/conversation/conversation-tabs/conversation-tabs-context-menu";
 
-const REAL_CONVERSATION_ID = "conv-abc123";
-
-let mockConversationId = REAL_CONVERSATION_ID;
+const CONVERSATION_ID = "conv-abc123";
 
 vi.mock("#/hooks/use-conversation-id", () => ({
-  useConversationId: () => ({ conversationId: mockConversationId }),
+  useConversationId: () => ({ conversationId: CONVERSATION_ID }),
 }));
 
 let mockHasTaskList = false;
@@ -22,8 +20,6 @@ vi.mock("#/hooks/use-task-list", () => ({
 describe("ConversationTabsContextMenu", () => {
   beforeEach(() => {
     localStorage.clear();
-    vi.resetAllMocks();
-    mockConversationId = REAL_CONVERSATION_ID;
     mockHasTaskList = false;
   });
 
@@ -51,20 +47,6 @@ describe("ConversationTabsContextMenu", () => {
     }
   });
 
-  it("should store unpinned tabs in localStorage", async () => {
-    const user = userEvent.setup();
-
-    render(<ConversationTabsContextMenu isOpen={true} onClose={vi.fn()} />);
-
-    const terminalItem = screen.getByText("COMMON$TERMINAL");
-    await user.click(terminalItem);
-
-    const storedState = JSON.parse(
-      localStorage.getItem(`conversation-state-${REAL_CONVERSATION_ID}`)!,
-    );
-    expect(storedState.unpinnedTabs).toContain("terminal");
-  });
-
   it("should re-pin a tab when clicking an unpinned tab", async () => {
     const user = userEvent.setup();
 
@@ -75,14 +57,14 @@ describe("ConversationTabsContextMenu", () => {
     // Unpin
     await user.click(terminalItem);
     let storedState = JSON.parse(
-      localStorage.getItem(`conversation-state-${REAL_CONVERSATION_ID}`)!,
+      localStorage.getItem(`conversation-state-${CONVERSATION_ID}`)!,
     );
     expect(storedState.unpinnedTabs).toContain("terminal");
 
     // Re-pin
     await user.click(terminalItem);
     storedState = JSON.parse(
-      localStorage.getItem(`conversation-state-${REAL_CONVERSATION_ID}`)!,
+      localStorage.getItem(`conversation-state-${CONVERSATION_ID}`)!,
     );
     expect(storedState.unpinnedTabs).not.toContain("terminal");
   });
