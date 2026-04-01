@@ -7,6 +7,7 @@ import {
   OpenHandsObservation,
   RecallObservation,
   TaskTrackingObservation,
+  DelegateObservation,
 } from "#/types/core/observations";
 import { getObservationResult } from "./get-observation-result";
 import { getDefaultEventContent, MAX_CONTENT_LENGTH } from "./shared";
@@ -147,6 +148,18 @@ const getTaskTrackingObservationContent = (
   return content;
 };
 
+const getDelegateObservationContent = (event: DelegateObservation): string => {
+  const { outputs } = event.extras;
+  if (!outputs || Object.keys(outputs).length === 0) {
+    return event.content || i18n.t("OBSERVATION_MESSAGE$DELEGATE");
+  }
+  let content = `**Result:**\n\`\`\`json\n${JSON.stringify(outputs, null, 2)}\n\`\`\``;
+  if (content.length > MAX_CONTENT_LENGTH) {
+    content = `${content.slice(0, MAX_CONTENT_LENGTH)}...(truncated)`;
+  }
+  return content;
+};
+
 export const getObservationContent = (event: OpenHandsObservation): string => {
   switch (event.observation) {
     case "read":
@@ -165,6 +178,8 @@ export const getObservationContent = (event: OpenHandsObservation): string => {
       return getRecallObservationContent(event);
     case "task_tracking":
       return getTaskTrackingObservationContent(event);
+    case "delegate":
+      return getDelegateObservationContent(event);
     default:
       return getDefaultEventContent(event);
   }

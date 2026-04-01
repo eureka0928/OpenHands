@@ -8,6 +8,7 @@ import { getActionContent } from "./get-action-content";
 import { getObservationContent } from "./get-observation-content";
 import { TaskTrackingObservationContent } from "../task-tracking/task-tracking-observation-content";
 import { TaskTrackerObservation } from "#/types/v1/core/base/observation";
+import { AgentDelegateAction } from "#/types/v1/core/base/action";
 import { SkillReadyEvent, isSkillReadyEvent } from "./create-skill-ready-event";
 import i18n from "#/i18n";
 
@@ -126,6 +127,12 @@ const getActionEventTitle = (event: OpenHandsEvent): React.ReactNode => {
     case "BrowserCloseTabAction":
       actionKey = "ACTION_MESSAGE$BROWSE";
       break;
+    case "AgentDelegateAction":
+      actionKey = "ACTION_MESSAGE$DELEGATE";
+      actionValues = {
+        agent: (event.action as AgentDelegateAction).agent,
+      };
+      break;
     default:
       // For unknown actions, use the type name
       return String(actionType).replace("Action", "").toUpperCase();
@@ -217,6 +224,9 @@ const getObservationEventTitle = (
           ? trimText(event.observation.pattern, 50)
           : "",
       };
+      break;
+    case "AgentDelegateObservation":
+      observationKey = "OBSERVATION_MESSAGE$DELEGATE";
       break;
     default:
       // For unknown observations, use the type name

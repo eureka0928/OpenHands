@@ -23,6 +23,7 @@ import {
   BrowserCloseTabAction,
   GlobAction,
   GrepAction,
+  AgentDelegateAction,
 } from "#/types/v1/core/base/action";
 
 const getRiskText = (risk: SecurityRisk) => {
@@ -209,6 +210,17 @@ const getBrowserActionContent = (action: BrowserAction): string => {
   }
 };
 
+const getDelegateActionContent = (action: AgentDelegateAction): string => {
+  let content = `**Agent:** ${action.agent}`;
+  if (action.thought) {
+    content += `\n\n**Thought:** ${action.thought}`;
+  }
+  if (action.inputs?.task) {
+    content += `\n\n**Task:** ${action.inputs.task}`;
+  }
+  return content;
+};
+
 export const getActionContent = (event: ActionEvent): string => {
   const { action } = event;
   const actionType = action.kind;
@@ -253,6 +265,9 @@ export const getActionContent = (event: ActionEvent): string => {
       return getSearchActionContent(
         event as ActionEvent<GlobAction | GrepAction>,
       );
+
+    case "AgentDelegateAction":
+      return getDelegateActionContent(action as AgentDelegateAction);
 
     default:
       return getDefaultEventContent(event);

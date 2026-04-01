@@ -255,6 +255,21 @@ export interface GlobAction extends ActionBase<"GlobAction"> {
   path: string | null;
 }
 
+export interface AgentDelegateAction extends ActionBase<"AgentDelegateAction"> {
+  /**
+   * The name of the agent to delegate to
+   */
+  agent: string;
+  /**
+   * The inputs to pass to the delegate agent
+   */
+  inputs: Record<string, string>;
+  /**
+   * The agent's reasoning for delegating
+   */
+  thought: string;
+}
+
 export interface GrepAction extends ActionBase<"GrepAction"> {
   /**
    * The regex pattern to search for in file contents.
@@ -291,4 +306,5 @@ export type Action =
   | BrowserSwitchTabAction
   | BrowserCloseTabAction
   | GlobAction
-  | GrepAction;
+  | GrepAction
+  | AgentDelegateAction;

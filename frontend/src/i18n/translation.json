@@ -9213,6 +9213,23 @@
     "uk": "Пошук файлів: <cmd>{{pattern}}</cmd>",
     "ca": "Cerca fitxers: <cmd>{{pattern}}</cmd>"
   },
+  "ACTION_MESSAGE$DELEGATE": {
+    "en": "Delegating to {{agent}}",
+    "ja": "{{agent}} に委任中",
+    "zh-CN": "委派给 {{agent}}",
+    "zh-TW": "委派給 {{agent}}",
+    "ko-KR": "{{agent}}에게 위임 중",
+    "no": "Delegerer til {{agent}}",
+    "it": "Delegando a {{agent}}",
+    "pt": "Delegando para {{agent}}",
+    "es": "Delegando a {{agent}}",
+    "ar": "التفويض إلى {{agent}}",
+    "fr": "Délégation à {{agent}}",
+    "tr": "{{agent}} ajanına devrediliyor",
+    "de": "Delegiere an {{agent}}",
+    "uk": "Делегування до {{agent}}",
+    "ca": "Delegant a {{agent}}"
+  },
   "OBSERVATION_MESSAGE$RUN": {
     "en": "Ran <cmd>{{command}}</cmd>",
     "zh-CN": "运行 <cmd>{{command}}</cmd>",
@@ -9399,6 +9416,23 @@
     "de": "In Dateien suchen: <cmd>{{pattern}}</cmd>",
     "uk": "Пошук у файлах: <cmd>{{pattern}}</cmd>",
     "ca": "Cerca als fitxers: <cmd>{{pattern}}</cmd>"
+  },
+  "OBSERVATION_MESSAGE$DELEGATE": {
+    "en": "Sub-agent completed",
+    "ja": "サブエージェント完了",
+    "zh-CN": "子代理已完成",
+    "zh-TW": "子代理已完成",
+    "ko-KR": "하위 에이전트 완료",
+    "no": "Underagent fullført",
+    "it": "Sub-agente completato",
+    "pt": "Sub-agente concluído",
+    "es": "Sub-agente completado",
+    "ar": "اكتمل الوكيل الفرعي",
+    "fr": "Sous-agent terminé",
+    "tr": "Alt ajan tamamlandı",
+    "de": "Sub-Agent abgeschlossen",
+    "uk": "Підагент завершив",
+    "ca": "Subagent completat"
   },
   "OBSERVATION_MESSAGE$TASK_TRACKING_PLAN": {
     "en": "Agent updated the plan",
