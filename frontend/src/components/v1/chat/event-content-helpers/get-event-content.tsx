@@ -8,7 +8,7 @@ import { getActionContent } from "./get-action-content";
 import { getObservationContent } from "./get-observation-content";
 import { TaskTrackingObservationContent } from "../task-tracking/task-tracking-observation-content";
 import { TaskTrackerObservation } from "#/types/v1/core/base/observation";
-import { AgentDelegateAction } from "#/types/v1/core/base/action";
+import { AgentDelegateAction, TaskAction } from "#/types/v1/core/base/action";
 import { SkillReadyEvent, isSkillReadyEvent } from "./create-skill-ready-event";
 import i18n from "#/i18n";
 
@@ -133,6 +133,12 @@ const getActionEventTitle = (event: OpenHandsEvent): React.ReactNode => {
         agent: (event.action as AgentDelegateAction).agent,
       };
       break;
+    case "TaskAction":
+      actionKey = "ACTION_MESSAGE$DELEGATE";
+      actionValues = {
+        agent: (event.action as TaskAction).subagent_type,
+      };
+      break;
     default:
       // For unknown actions, use the type name
       return String(actionType).replace("Action", "").toUpperCase();
@@ -226,6 +232,7 @@ const getObservationEventTitle = (
       };
       break;
     case "AgentDelegateObservation":
+    case "TaskObservation":
       observationKey = "OBSERVATION_MESSAGE$DELEGATE";
       break;
     default:

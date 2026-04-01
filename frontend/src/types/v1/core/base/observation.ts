@@ -286,6 +286,25 @@ export interface GrepObservation extends ObservationBase<"GrepObservation"> {
   truncated: boolean;
 }
 
+export interface TaskObservation extends ObservationBase<"TaskObservation"> {
+  /**
+   * Content returned from the sub-agent task
+   */
+  content: Array<TextContent | ImageContent>;
+  /**
+   * The unique identifier of the task
+   */
+  task_id: string;
+  /**
+   * The subagent type that handled the task
+   */
+  subagent: string;
+  /**
+   * The status of the task
+   */
+  status: string;
+}
+
 export type Observation =
   | MCPToolObservation
   | FinishObservation
@@ -299,4 +318,5 @@ export type Observation =
   | PlanningFileEditorObservation
   | GlobObservation
   | GrepObservation
-  | AgentDelegateObservation;
+  | AgentDelegateObservation
+  | TaskObservation;

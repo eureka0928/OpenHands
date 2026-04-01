@@ -24,6 +24,7 @@ import {
   GlobAction,
   GrepAction,
   AgentDelegateAction,
+  TaskAction,
 } from "#/types/v1/core/base/action";
 
 const getRiskText = (risk: SecurityRisk) => {
@@ -210,6 +211,15 @@ const getBrowserActionContent = (action: BrowserAction): string => {
   }
 };
 
+const getTaskActionContent = (action: TaskAction): string => {
+  let content = `**Agent:** ${action.subagent_type}`;
+  if (action.description) {
+    content += `\n\n**Description:** ${action.description}`;
+  }
+  content += `\n\n**Prompt:** ${action.prompt}`;
+  return content;
+};
+
 const getDelegateActionContent = (action: AgentDelegateAction): string => {
   let content = `**Agent:** ${action.agent}`;
   if (action.thought) {
@@ -268,6 +278,9 @@ export const getActionContent = (event: ActionEvent): string => {
 
     case "AgentDelegateAction":
       return getDelegateActionContent(action as AgentDelegateAction);
+
+    case "TaskAction":
+      return getTaskActionContent(action as TaskAction);
 
     default:
       return getDefaultEventContent(event);
