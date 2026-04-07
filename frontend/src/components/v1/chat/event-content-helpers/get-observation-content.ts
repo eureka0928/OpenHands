@@ -14,7 +14,6 @@ import {
   TaskTrackerObservation,
   GlobObservation,
   GrepObservation,
-  AgentDelegateObservation,
   TaskObservation,
 } from "#/types/v1/core/base/observation";
 
@@ -312,20 +311,6 @@ const getTaskObservationContent = (
   return content;
 };
 
-const getDelegateObservationContent = (
-  event: ObservationEvent<AgentDelegateObservation>,
-): string => {
-  const { observation } = event;
-  if (!observation.outputs || Object.keys(observation.outputs).length === 0) {
-    return observation.content || i18n.t("OBSERVATION_MESSAGE$DELEGATE");
-  }
-  let content = `**Result:**\n\`\`\`json\n${JSON.stringify(observation.outputs, null, 2)}\n\`\`\``;
-  if (content.length > MAX_CONTENT_LENGTH) {
-    content = `${content.slice(0, MAX_CONTENT_LENGTH)}...(truncated)`;
-  }
-  return content;
-};
-
 export const getObservationContent = (event: ObservationEvent): string => {
   const observationType = event.observation.kind;
 
@@ -377,11 +362,6 @@ export const getObservationContent = (event: ObservationEvent): string => {
     case "GrepObservation":
       return getGrepObservationContent(
         event as ObservationEvent<GrepObservation>,
-      );
-
-    case "AgentDelegateObservation":
-      return getDelegateObservationContent(
-        event as ObservationEvent<AgentDelegateObservation>,
       );
 
     case "TaskObservation":

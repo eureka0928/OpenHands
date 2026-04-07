@@ -23,7 +23,6 @@ import {
   BrowserCloseTabAction,
   GlobAction,
   GrepAction,
-  AgentDelegateAction,
   TaskAction,
 } from "#/types/v1/core/base/action";
 
@@ -220,17 +219,6 @@ const getTaskActionContent = (action: TaskAction): string => {
   return content;
 };
 
-const getDelegateActionContent = (action: AgentDelegateAction): string => {
-  let content = `**Agent:** ${action.agent}`;
-  if (action.thought) {
-    content += `\n\n**Thought:** ${action.thought}`;
-  }
-  if (action.inputs?.task) {
-    content += `\n\n**Task:** ${action.inputs.task}`;
-  }
-  return content;
-};
-
 export const getActionContent = (event: ActionEvent): string => {
   const { action } = event;
   const actionType = action.kind;
@@ -275,9 +263,6 @@ export const getActionContent = (event: ActionEvent): string => {
       return getSearchActionContent(
         event as ActionEvent<GlobAction | GrepAction>,
       );
-
-    case "AgentDelegateAction":
-      return getDelegateActionContent(action as AgentDelegateAction);
 
     case "TaskAction":
       return getTaskActionContent(action as TaskAction);

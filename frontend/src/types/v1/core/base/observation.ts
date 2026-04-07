@@ -244,17 +244,6 @@ export interface GlobObservation extends ObservationBase<"GlobObservation"> {
   truncated: boolean;
 }
 
-export interface AgentDelegateObservation extends ObservationBase<"AgentDelegateObservation"> {
-  /**
-   * Content returned from the delegate agent
-   */
-  content: string;
-  /**
-   * The outputs from the delegate agent
-   */
-  outputs: Record<string, unknown>;
-}
-
 export interface GrepObservation extends ObservationBase<"GrepObservation"> {
   /**
    * Content returned from the tool as a list of TextContent/ImageContent objects.
@@ -318,5 +307,4 @@ export type Observation =
   | PlanningFileEditorObservation
   | GlobObservation
   | GrepObservation
-  | AgentDelegateObservation
   | TaskObservation;

@@ -10,7 +10,6 @@ import {
   OpenHandsAction,
   FinishAction,
   TaskTrackingAction,
-  DelegateAction,
 } from "#/types/core/actions";
 import { getDefaultEventContent, MAX_CONTENT_LENGTH } from "./shared";
 import i18n from "#/i18n";
@@ -113,17 +112,6 @@ const getTaskTrackingActionContent = (event: TaskTrackingAction): string => {
   return content;
 };
 
-const getDelegateActionContent = (event: DelegateAction): string => {
-  let content = `**Agent:** ${event.args.agent}`;
-  if (event.args.thought) {
-    content += `\n\n**Thought:** ${event.args.thought}`;
-  }
-  if (event.args.inputs?.task) {
-    content += `\n\n**Task:** ${event.args.inputs.task}`;
-  }
-  return content;
-};
-
 const getNoContentActionContent = (): string => "";
 
 export const getActionContent = (event: OpenHandsAction): string => {
@@ -149,8 +137,6 @@ export const getActionContent = (event: OpenHandsAction): string => {
       return getFinishActionContent(event);
     case "task_tracking":
       return getTaskTrackingActionContent(event);
-    case "delegate":
-      return getDelegateActionContent(event);
     default:
       return getDefaultEventContent(event);
   }

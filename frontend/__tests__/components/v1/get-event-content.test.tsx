@@ -146,80 +146,6 @@ describe("getEventContent", () => {
     expect(screen.queryByText("$ git status")).not.toBeInTheDocument();
   });
 
-  describe("delegate events", () => {
-    const delegateActionEvent: ActionEvent = {
-      id: "action-delegate-1",
-      timestamp: new Date().toISOString(),
-      source: "agent",
-      thought: [{ type: "text", text: "I need help browsing." }],
-      thinking_blocks: [],
-      action: {
-        kind: "AgentDelegateAction",
-        agent: "BrowsingAgent",
-        inputs: { task: "Search for documentation" },
-        thought: "I need help browsing.",
-      },
-      tool_name: "delegate",
-      tool_call_id: "tool-delegate-1",
-      tool_call: {
-        id: "tool-delegate-1",
-        type: "function",
-        function: {
-          name: "delegate",
-          arguments: '{"agent":"BrowsingAgent"}',
-        },
-      },
-      llm_response_id: "response-delegate-1",
-      security_risk: SecurityRisk.LOW,
-    };
-
-    const delegateObservationEvent: ObservationEvent = {
-      id: "obs-delegate-1",
-      timestamp: new Date().toISOString(),
-      source: "environment",
-      tool_name: "delegate",
-      tool_call_id: "tool-delegate-1",
-      action_id: "action-delegate-1",
-      observation: {
-        kind: "AgentDelegateObservation",
-        content: "Browsing completed.",
-        outputs: { result: "Found the documentation page." },
-      },
-    };
-
-    it("shows delegate action title with agent name", () => {
-      const { title } = getEventContent(delegateActionEvent);
-
-      render(<span>{title}</span>);
-      expect(
-        screen.getByText("ACTION_MESSAGE$DELEGATE"),
-      ).toBeInTheDocument();
-    });
-
-    it("shows delegate action details with agent and task", () => {
-      const { details } = getEventContent(delegateActionEvent);
-
-      expect(details).toContain("**Agent:** BrowsingAgent");
-      expect(details).toContain("**Task:** Search for documentation");
-    });
-
-    it("shows delegate observation title", () => {
-      const { title } = getEventContent(delegateObservationEvent);
-
-      render(<span>{title}</span>);
-      expect(
-        screen.getByText("OBSERVATION_MESSAGE$DELEGATE"),
-      ).toBeInTheDocument();
-    });
-
-    it("shows delegate observation details with outputs", () => {
-      const { details } = getEventContent(delegateObservationEvent);
-
-      expect(details).toContain("**Result:**");
-      expect(details).toContain("Found the documentation page.");
-    });
-  });
-
   describe("task events (TaskToolSet)", () => {
     const taskActionEvent: ActionEvent = {
       id: "action-task-1",
@@ -269,7 +195,7 @@ describe("getEventContent", () => {
 
       render(<span>{title}</span>);
       expect(
-        screen.getByText("ACTION_MESSAGE$DELEGATE"),
+        screen.getByText("ACTION_MESSAGE$TASK"),
       ).toBeInTheDocument();
     });
 
@@ -285,7 +211,7 @@ describe("getEventContent", () => {
 
       render(<span>{title}</span>);
       expect(
-        screen.getByText("OBSERVATION_MESSAGE$DELEGATE"),
+        screen.getByText("OBSERVATION_MESSAGE$TASK"),
       ).toBeInTheDocument();
     });
 

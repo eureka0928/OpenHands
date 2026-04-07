@@ -7,8 +7,7 @@ type EventType =
   | "FileEditor"
   | "StrReplaceEditor"
   | "TaskTracker"
-  | "PlanningFileEditor"
-  | "AgentDelegate";
+  | "PlanningFileEditor";
 
 type ActionOnlyType =
   | "BrowserNavigate"
