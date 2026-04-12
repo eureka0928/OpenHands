@@ -62,15 +62,16 @@ class LocalhostCORSMiddleware(CORSMiddleware):
             if hostname in ('localhost', '127.0.0.1'):
                 return True
 
-            # Allow any origin when no specific origins are configured (development mode)
-            # WARNING: This disables CORS protection. Use explicit CORS origins in production.
-            logging.getLogger(__name__).warning(
-                f'No CORS origins configured, allowing origin: {origin}. '
-                'Set OH_PERMITTED_CORS_ORIGINS for production environments.'
-            )
-            return True
+            if not self.allow_origins and not self.allow_origin_regex:
+                # Allow any origin when no specific origins are configured (development mode)
+                # WARNING: This disables CORS protection. Use explicit CORS origins in production.
+                logging.getLogger(__name__).warning(
+                    f'No CORS origins configured, allowing origin: {origin}. '
+                    'Set OH_PERMITTED_CORS_ORIGINS for production environments.'
+                )
+                return True
 
-        # For missing origin or other origins, use the parent class's logic
+        # For configured origins or missing origin, use the parent class's logic
         result: bool = super().is_allowed_origin(origin)
         return result
 
